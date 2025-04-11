@@ -16,10 +16,12 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('/GET metrics should validate missing url)', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    return request(app.getHttpServer()).get('/metrics').expect(400);
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });
