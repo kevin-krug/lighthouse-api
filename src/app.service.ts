@@ -34,7 +34,23 @@ const metricKeys = [
 
 @Injectable()
 export class AppService {
+  private lighthouseQueue: Promise<void> = Promise.resolve();
+
   async getMetrics(url: string): Promise<IMetrics> {
+    let runnerResult: IMetrics;
+    return new Promise((resolve, reject) => {
+      this.lighthouseQueue = this.lighthouseQueue.then(async () => {
+        try {
+          runnerResult = await this.runLighthouse(url);
+          resolve(runnerResult);
+        } catch (e) {
+          reject(e as Error);
+        }
+      });
+    });
+  }
+
+  private async runLighthouse(url: string): Promise<IMetrics> {
     const lighthouse = (await import('lighthouse')).default;
     const chromeLaunch = (await import('chrome-launcher')).launch;
 
@@ -89,10 +105,11 @@ export class AppService {
 
     return {
       url: runnerResult?.lhr.finalDisplayedUrl,
-      userAgent: runnerResult?.lhr.finalDisplayedUrl,
+      userAgent: runnerResult?.lhr.userAgent,
       score: categories?.performance?.score || 0 * 100 * 100,
       metrics,
       opportunities,
     };
   }
 }
+
