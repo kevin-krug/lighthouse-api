@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import config from './config';
-import { Flags, RunnerResult } from 'lighthouse';
+import type { Flags, RunnerResult } from 'lighthouse';
 
 export interface IMetrics {
   url?: string;
@@ -68,6 +68,7 @@ export class AppService {
       config,
     );
 
+    // `.lhr` is the Lighthouse Result as a JS object
     const audits = runnerResult?.lhr?.audits;
     const categories = runnerResult?.lhr?.categories;
 
@@ -112,4 +113,3 @@ export class AppService {
     };
   }
 }
-
